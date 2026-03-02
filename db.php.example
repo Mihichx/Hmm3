@@ -1,0 +1,6 @@
+<?
+    $host = 'your_host';          // имя хоста
+	$user = 'your_username';      // имя пользователя
+	$password = 'your_password';  // пароль
+	$name = 'your_db_name';       // имя базы данных
+?>

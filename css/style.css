@@ -1,0 +1,127 @@
+/* body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Tahoma', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+        
+.homm-table {
+    width: 800px;
+    background-color: #1c3664; 
+    border: 4px solid #ad964d; 
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.homm-table th {
+    color: #e8dcb5; 
+    padding: 10px;
+    border-bottom: 2px solid #ad964d;
+    font-size: 14px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.homm-table td {
+    padding: 8px 15px;
+    border-bottom: 1px solid #4a6fa5;
+    text-align: center;
+    font-size: 14px;
+}
+
+.homm-table tr:hover {
+    background-color: #26457d;
+    cursor: pointer;
+}
+
+.title-col {
+    text-align: left !important;
+    font-weight: bold;
+    color: #fff;
+}
+        
+.map-size {
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    color: #ffd700;
+} */
+
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: Tahoma, sans-serif;
+}
+
+.homm-table {
+    margin: 20px auto;      
+    width: 800px;
+    background: #1c3664;
+    border: 4px solid #ad964d;
+    
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #4a6fa5;
+    text-align: center;
+}
+
+th {
+    color: #e8dcb5;         
+    border-bottom: 2px solid #ad964d;
+}
+
+tr:hover {
+    background: #26457d;    
+    cursor: pointer;
+}
+
+
+.title-col { 
+    text-align: left; 
+    font-weight: bold; 
+}
+
+.map-size { 
+    color: #ffd700; 
+    font-weight: bold; 
+}
+
+/* карта */
+.map-table {
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+.map-table td {
+  width: 60px; /* Увеличено в 2 раза (было ~30 px) */
+  height: 60px; /* Увеличено в 2 раза */
+  border: 2px solid #333;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+/* Фоновые изображения для территорий */
+.terrain-0 { 
+    background-image: url('../img/grass.png'); 
+}
+.terrain-1 { 
+    background-image: url('../img/mud.png'); 
+}
+.terrain-2 { 
+    background-image: url('../img/snow.png'); 
+}
+.terrain-3 { 
+    background-image: url('../img/swamp.png'); 
+}
+
+.none {
+    display: none;
+}
+
+.map-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
