@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Anno Online</title>
     <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <script>
+        const terrainNames = <?php 
+        include './db.php';
+        $link = mysqli_connect($host, $user, $password, $name);
+        mysqli_set_charset($link, "utf8");
+        $res = mysqli_query($link, 'SELECT id, name, description FROM terrain_homm');
+        $terraindata = [];
+        while ($row = mysqli_fetch_assoc($res)) {
+            $terraindata[$row['id']] = [
+                'name' => $row['name'],
+                'description' => $row['description']
+                ];
+        }
+        echo json_encode($terraindata, JSON_UNESCAPED_UNICODE);
+        ?>;
+    </script>
     <script defer src="./js/system.js"></script>
     <script defer src="./js/main.js"></script>
+    <style>
+        <?include_once './css/terraincss.php'?>
+            
+
+    </style>
 </head>
 <body>
     <main class="map-main">
@@ -25,12 +46,17 @@
             <button type="submit" id="save" onclick="let data = document.getElementById('data').value; system.save(data);">Сохранить</button>
             <input type="file" id="fileLoad"></input>
             <select id="terrain-select" class="poly-btn">
-                <option value="0">трава</option>
-                <option value="1">грязь</option>
-                <option value="2">снег</option>
-                <option value="3">болото</option>
+                <?foreach($terrain as $item):?>
+                <option value="<?=$item["id"];?>"><?=$item["name"]?></option>
+                <?endforeach;?>
             </select>
             <button id="end">Закончить редактирование</button>
+            <div id="inspector" class="inspector-panel">
+                <h3>Информация о клетке</h3>
+                <p>Координаты: <span id="info-coords">Выберите клетку</span></p>
+                <p>Тип ландшафта: <span id="info-type"></span></p>
+                <p>Описание: <span id="info-desc"></span></p>
+            </div>
         </div>
         <div id="map-container"></div>
     </main>
