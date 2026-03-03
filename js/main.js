@@ -75,6 +75,16 @@ class Screen {
     this.container.innerHTML = '';
     this.container.appendChild(table);
   }
+  displayInfo(i, j, value) {
+    const coordsElement = document.getElementById('info-coords');
+    const typeElement = document.getElementById('info-type');
+    const descElement = document.getElementById('info-desc');
+    const data = terrainNames[value] || terrainNames[String(value)];
+    if (coordsElement) coordsElement.innerText = `${i}, ${j}`;
+    if (typeElement) typeElement.innerText = data.name;
+    if (descElement) descElement.innerText = data.description;
+    console.log(`координаты клетки: [${i}, ${j}]. Тип: ${data.name}`);
+  }
 
   // Обработчик клика по таблице
   delegateHandler(event) {
@@ -85,6 +95,8 @@ class Screen {
 
     // Извлекаем координаты из data-coord (превращаем "5_10" в числа 5 и 10)
     const [i, j] = target.dataset.coord.split('_').map(Number);
+    const currentValue = this.scene.getCell(i, j);
+    this.displayInfo(i, j, currentValue);
     
     if (flags == true) {
       this.updateCell(target, i, j);
