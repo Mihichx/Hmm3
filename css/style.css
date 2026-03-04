@@ -101,19 +101,6 @@ tr:hover {
   background-position: center;
   cursor: pointer;
 }
-/* Фоновые изображения для территорий */
-.terrain-0 { 
-    background-image: url('../img/grass.png'); 
-}
-.terrain-1 { 
-    background-image: url('../img/mud.png'); 
-}
-.terrain-2 { 
-    background-image: url('../img/snow.png'); 
-}
-.terrain-3 { 
-    background-image: url('../img/swamp.png'); 
-}
 
 .none {
     display: none;

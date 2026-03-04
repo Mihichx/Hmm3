@@ -7,26 +7,24 @@
     <link rel="stylesheet" type="text/css" href="./css/style.css">
     <script>
         const terrainNames = <?php 
-        include './db.php';
-        $link = mysqli_connect($host, $user, $password, $name);
-        mysqli_set_charset($link, "utf8");
-        $res = mysqli_query($link, 'SELECT id, name, description FROM terrain_homm');
-        $terraindata = [];
-        while ($row = mysqli_fetch_assoc($res)) {
-            $terraindata[$row['id']] = [
-                'name' => $row['name'],
-                'description' => $row['description']
-                ];
-        }
-        echo json_encode($terraindata, JSON_UNESCAPED_UNICODE);
+            include './db.php';
+            $link = mysqli_connect($host, $user, $password, $name);
+            mysqli_set_charset($link, "utf8");
+            $res = mysqli_query($link, 'SELECT id, name, description FROM terrain_homm');
+            $terraindata = [];
+            while ($row = mysqli_fetch_assoc($res)) {
+                $terraindata[$row['id']] = [
+                    'name' => $row['name'],
+                    'description' => $row['description']
+                    ];
+            }
+            echo json_encode($terraindata, JSON_UNESCAPED_UNICODE);
         ?>;
     </script>
     <script defer src="./js/system.js"></script>
     <script defer src="./js/main.js"></script>
     <style>
         <?include_once './css/terraincss.php'?>
-            
-
     </style>
 </head>
 <body>
@@ -47,7 +45,7 @@
             <input type="file" id="fileLoad"></input>
             <select id="terrain-select" class="poly-btn">
                 <?foreach($terrain as $item):?>
-                <option value="<?=$item["id"];?>"><?=$item["name"]?></option>
+                    <option value="<?=$item["id"];?>"><?=$item["name"]?></option>
                 <?endforeach;?>
             </select>
             <button id="end">Закончить редактирование</button>

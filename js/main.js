@@ -27,7 +27,7 @@ class Scene {
     for (let i = 0; i < this.rows; i++) {
       this.matrix[i] = []; // Создаем строку
       for (let j = 0; j < this.cols; j++) {
-        this.matrix[i][j] = 0; // В каждый столбец пишем 0 (Вода)
+        this.matrix[i][j] = 1; // В каждый столбец пишем 0 (Вода)
       }
     }
   }
@@ -75,15 +75,24 @@ class Screen {
     this.container.innerHTML = '';
     this.container.appendChild(table);
   }
+  
   displayInfo(i, j, value) {
     const coordsElement = document.getElementById('info-coords');
     const typeElement = document.getElementById('info-type');
     const descElement = document.getElementById('info-desc');
-    const data = terrainNames[value] || terrainNames[String(value)];
+    const data = terrainNames[value];
     if (coordsElement) coordsElement.innerText = `${i}, ${j}`;
-    if (typeElement) typeElement.innerText = data.name;
-    if (descElement) descElement.innerText = data.description;
-    console.log(`координаты клетки: [${i}, ${j}]. Тип: ${data.name}`);
+    // Проверяем, нашлись ли данные в terrainNames
+    if (data) {
+        if (typeElement) typeElement.innerText = data.name;
+        if (descElement) descElement.innerText = data.description;
+        console.log(`координаты клетки: [${i}, ${j}]. Тип: ${data.name}`);
+    } else {
+        // Опционально: обработка случая, когда данные не найдены
+        if (typeElement) typeElement.innerText = "Неизвестно";
+        if (descElement) descElement.innerText = "Описание отсутствует";
+        console.warn(`Данные для значения "${value}" не найдены в terrainNames`);
+    }
   }
 
   // Обработчик клика по таблице
@@ -95,14 +104,14 @@ class Screen {
 
     // Извлекаем координаты из data-coord (превращаем "5_10" в числа 5 и 10)
     const [i, j] = target.dataset.coord.split('_').map(Number);
-    const currentValue = this.scene.getCell(i, j);
-    this.displayInfo(i, j, currentValue);
-    
+
     if (flags == true) {
       this.updateCell(target, i, j);
+      this.displayInfo(i, j, this.scene.getCell(i, j));
     } else {
       if (this.b == false) {
         this.updateCell1(target, i, j);
+        this.displayInfo(i, j, this.scene.getCell(i, j));
       } else {
         this.updateCell2(target, i, j);
         this.b = false;
