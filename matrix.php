@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Anno Online</title>
+    <title>Hmm3</title>
     <link rel="stylesheet" type="text/css" href="./css/style.css">
     <script>
         const terrainNames = <?php 
             include './db.php';
-            $link = mysqli_connect($host, $user, $password, $name);
-            mysqli_set_charset($link, "utf8");
             $res = mysqli_query($link, 'SELECT id, name, description FROM terrain_homm');
             $terraindata = [];
             while ($row = mysqli_fetch_assoc($res)) {
@@ -20,6 +18,9 @@
             }
             echo json_encode($terraindata, JSON_UNESCAPED_UNICODE);
         ?>;
+    </script>
+    <script>
+        var totalIds = <?php echo $count; ?>;
     </script>
     <script defer src="./js/system.js"></script>
     <script defer src="./js/main.js"></script>

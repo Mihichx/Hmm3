@@ -9,13 +9,10 @@ let mapData = {
     width: parseInt(urlParams.get('map_width')),
     height: parseInt(urlParams.get('map_height')),
 };
-console.log(mapData);
 
 class Scene {
   constructor(data) {
-    // Проверка: если data вдруг придет пустой, берем дефолты
     const config = data;
-    
     this.rows = config.width;
     this.cols = config.height;
     this.matrix = []; // Двумерный массив (сетка координат)
@@ -114,6 +111,7 @@ class Screen {
       // Если в руках УЖЕ есть юнит (this.b == true)
       else if (this.b === true) {
           this.updateCell2(td, i, j); // Кладем в новую ячейку
+          this.displayInfo(i, j, this.scene.getCell(i, j));
       }
     }
 }
@@ -143,7 +141,6 @@ class Screen {
       this.a = img;    // Сохраняем КАРТИНКУ в переменную "a"
       img.remove();    // Удаляем КАРТИНКУ из HTML
       this.b = true;   // Теперь юнит "в руках"
-      console.log("Юнит взят из:", i, j);
     }
   }
 
@@ -156,8 +153,6 @@ class Screen {
       tdElement.appendChild(this.a); // Вставляем сохраненную картинку
       this.a = null;                 // Руки пусты
       this.b = false;                // Сбрасываем флаг
-      console.log("Юнит поставлен в:", i, j);
-      console.log(this.units);
     }
   }
 }
@@ -213,7 +208,7 @@ function loadedData(content) {
   // 2. Ищем и меняем значение (проходим по двумерному массиву)
   for (let i = 0; i < loadedMatrix.length; i++) {
     for (let j = 0; j < loadedMatrix[i].length; j++) {
-      if (loadedMatrix[i][j] > 5  || loadedMatrix[i][j] < 0) {
+      if (loadedMatrix[i][j] > totalIds  || loadedMatrix[i][j] < 0) {
         loadedMatrix[i][j] = 1;
       }
     }
