@@ -1,21 +1,29 @@
-<?
-include_once './db.php';
+<?php
+header("Content-type: text/css; charset: UTF-8");
 
+session_start();
+include __DIR__ . '/../setting.php'; 
 
-$link = mysqli_connect($host, $user, $password, $name);
-$query = 'SELECT * FROM terrain_homm';
-$res = mysqli_query($link, $query);
+$dsn = "mysql:host=localhost;dbname=" . $dbAuth['base'] . ";charset=utf8mb4";
+$opt = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
 
-$terrain = [];
+try {
+    $db = new PDO($dsn, $dbAuth['user'], $dbAuth['password'], $opt);
 
-while ($row = mysqli_fetch_assoc($res)) {
-    $terrain[] = $row;    
+    $query = "SELECT id, img_link FROM terrain_homm";
+    $stmt = $db->query($query);
+
+    while ($row = $stmt->fetch()) {
+        $id = $row['id'];
+        $img = $row['img_link'];
+        echo ".terrain-$id {\n";
+        echo "    background-image: url('../img/$img') !important;\n";
+        echo "    background-size: cover !important;\n";
+        echo "}\n";
+    }
+} catch (Exception $e) {
+    echo "/* Ошибка: " . $e->getMessage() . " */";
 }
-?>
-<?foreach($terrain as $item):
-    echo ".terrain" ."-". $item["id"] . " {\n";
-    echo "  background-image: url('" . $item["img_link"] . "');\n";
-    echo "  background-size: cover;\n";
-    echo "}\n";
-?>
-<?endforeach;?>
