@@ -15,6 +15,29 @@ let system = (function() {
             this.reader.onerror = function() {
                 self.loading = false;
             };
+            
+        }
+        async request(url, data) {
+            let formData = new FormData();
+            for (let key in data) {
+                formData.append(key, data[key]);
+            }
+
+            try {
+                let response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    return await response.text(); // возвращаем текст (JSON), который потом распарсит DataType
+                } else {
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+            } catch (error) {
+                console.error('Ошибка запроса:', error);
+                throw error;
+            }
         }
         
         // сохранение файла
@@ -43,7 +66,7 @@ let system = (function() {
                 setTimeout(() => resolve("готово!"), miliseconds)
             });
             
-            let result = await promise; // будет ждать, пока промис не выполнится (*)
+            let result = await promise; 
             return result;
         }
         
