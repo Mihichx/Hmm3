@@ -9,6 +9,33 @@ let mapData = {
     width: parseInt(urlParams.get('map_width')),
     height: parseInt(urlParams.get('map_height')),
 };
+let scene;
+let screen;
+let flags = true;
+// Настройка списка типов
+typeList
+    .setPath('answer.php') 
+    .addType({code: 'terrain_homm', name: "Ландшафт", column: "name"}) // Указываем колонку с именем
+    .load(() => {
+        // Данные загружены! Заполняем select
+        const select = document.getElementById('terrain-select');
+        const terrains = typeList.list.terrain_homm.getList(); // Получаем кэшированный список
+
+        if (terrains) {
+            terrains.forEach(item => {
+                let option = document.createElement('option');
+                option.value = item.type; // Это ID или код из БД
+                option.textContent = item.name;
+                select.appendChild(option);
+            });
+        }
+        
+        console.log("Редактор готов. Данные ландшафтов:", terrains);
+        
+        // Тут можно вызывать функцию отрисовки карты
+        // initMap(width, height); 
+    });
+
 
 class Scene {
   constructor(data) {
@@ -74,23 +101,22 @@ class Screen {
     this.container.appendChild(table);
   }
   
-  displayInfo(i, j, value) {
+displayInfo(i, j, value) {
     const coordsElement = document.getElementById('info-coords');
     const typeElement = document.getElementById('info-type');
     const descElement = document.getElementById('info-desc');
-    const data = terrainNames[value];
+
     if (coordsElement) coordsElement.innerText = `${i}, ${j}`;
-    // Проверяем, нашлись ли данные в terrainNames
-    if (data) {
-        if (typeElement) typeElement.innerText = data.name;
-        if (descElement) descElement.innerText = data.description;
+    const terrainData = typeList.list.terrain_homm.getOne(value);
+
+    if (terrainData) {
+        if (typeElement) typeElement.innerText = terrainData.name;
+        if (descElement) descElement.innerText = terrainData.description || "Описание отсутствует";
     } else {
-        // Опционально: обработка случая, когда данные не найдены
         if (typeElement) typeElement.innerText = "Неизвестно";
-        if (descElement) descElement.innerText = "Описание отсутствует";
-        console.warn(`Данные для значения "${value}" не найдены в terrainNames`);
+        if (descElement) descElement.innerText = "Нет данных в базе";
     }
-  }
+}
 
   // Обработчик клика по таблице
   delegateHandler(event) {
@@ -160,9 +186,9 @@ class Screen {
 /**
  * ГЛОБАЛЬНЫЙ ЗАПУСК И КНОПКИ
  */
-let flags = true; // Разрешено ли редактирование прямо сейчас
-let scene = new Scene(mapData); // Создаем логику
-let screen = new Screen(scene, 'map-container'); // Создаем экран
+flags = true; // Разрешено ли редактирование прямо сейчас
+scene = new Scene(mapData); // Создаем логику
+screen = new Screen(scene, 'map-container'); // Создаем экран
 
 // Первый запуск отрисовки
 screen.draw();
@@ -202,19 +228,20 @@ if (document.getElementById('fileLoad')) {
 
 // Выполнится, когда файл будет выбран и прочитан
 function loadedData(content) {
-  // 1. Превращаем строку из файла в настоящий массив
-  let loadedMatrix = JSON.parse(content.result);
+    let loadedMatrix = JSON.parse(content.result);
+    
+    // Получаем количество доступных типов из справочника
+    const availableTypes = typeList.list.terrain_homm.getAll();
 
-  // 2. Ищем и меняем значение (проходим по двумерному массиву)
-  for (let i = 0; i < loadedMatrix.length; i++) {
-    for (let j = 0; j < loadedMatrix[i].length; j++) {
-      if (loadedMatrix[i][j] > totalIds  || loadedMatrix[i][j] < 0) {
-        loadedMatrix[i][j] = 1;
-      }
+    for (let i = 0; i < loadedMatrix.length; i++) {
+        for (let j = 0; j < loadedMatrix[i].length; j++) {
+            // Если ID в файле нет в нашей базе данных — ставим тип 1 (траву)
+            if (!availableTypes[loadedMatrix[i][j]]) {
+                loadedMatrix[i][j] = 1;
+            }
+        }
     }
-  }
 
-  // 3. Сохраняем результат в "мозг" программы и рисуем
-  scene.matrix = loadedMatrix;
-  screen.draw();
+    scene.matrix = loadedMatrix;
+    screen.draw();
 }
