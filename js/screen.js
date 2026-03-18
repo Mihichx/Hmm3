@@ -21,9 +21,15 @@ class Screen {
       for (let j = 0; j < this.scene.matrix[i].length; j++) {
         let td = document.createElement('td');
 
-        const cellValue = this.scene.matrix[i][j];
-        td.className = 'terrain-' + cellValue;  // Создаём
-        td.dataset.coord = `${i}_${j}`;  // Добавление координат в td элемент
+        const cell = this.scene.getCell(i, j);
+        td.className = 'terrain-' + cell.terrain;
+        td.dataset.coord = `${i}_${j}`;
+        if (cell.unit) {
+          let img = document.createElement('img');
+          img.src = cell.unit.img || './img/icon.png';
+          img.classList.add('img-size');
+          td.appendChild(img);
+        }
         tr.appendChild(td);  // Добавление ячейки(td) в строку(tr)
       }
       table.appendChild(tr);  // Добавление строки(tr) в таблицу
@@ -31,24 +37,41 @@ class Screen {
     this.container.innerHTML = '';  // Очищает контейнер
     this.container.appendChild(table);  // Добавляем таблицу в контейнер
   }
+  
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   // Отвечает за отображения информации о территории
-  displayInfo(i, j, value) {
+  displayInfo(i, j) {
     const coordsElement = document.getElementById('info-coords');
     const typeElement = document.getElementById('info-type');
     const descElement = document.getElementById('info-desc');
 
     if (coordsElement) coordsElement.innerText = `${i}, ${j}`;
-    const terrainData = typeList.list.terrain_homm.getOne(value);
+    const cell = this.scene.getCell(i, j);
+    const terrainData = typeList.list.terrain.getOne(cell.terrain);
 
     if (terrainData) {
-      if (typeElement) typeElement.innerText = terrainData.name;
-      if (descElement) descElement.innerText = terrainData.description || "Описание отсутствует";
-    } else {
-      if (typeElement) typeElement.innerText = "Неизвестно";
-      if (descElement) descElement.innerText = "Нет данных в базе";
+      if (typeElement) typeElement.innerText = terrainData?.name || 'Неизвестно';
+      if (descElement) descElement.innerText = '\n Территория: ' + terrainData.description || "Описание отсутствует";
+    }
+
+    if (cell.unit) {
+      const unitName = cell.unit.name || cell.unit.type || 'без имени';
+      const unitStats = [];
+      if (cell.unit.health != null) unitStats.push(`HP:${cell.unit.health}`);
+      if (cell.unit.speed != null) unitStats.push(`SPD:${cell.unit.speed}`);
+      if (cell.unit.attack != null) unitStats.push(`ATK:${cell.unit.attack}`);
+      if (cell.unit.protection != null) unitStats.push(`DEF:${cell.unit.protection}`);
+
+      if (typeElement) typeElement.innerText += ` + юнит ${unitName}`;
+      if (descElement) descElement.innerText += `\n Юнит: ${unitName} ${unitStats.join(', ')}`;
     }
   }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   // Обработчик клика по таблице
   delegateHandler(event) {
@@ -59,51 +82,98 @@ class Screen {
 
     if (flags == true) {  // Если редактирование разрешено
       this.updateCell(td, i, j);
-      this.displayInfo(i, j, this.scene.getCell(i, j));
+      this.displayInfo(i, j);
     } else {
       // Если в руках ничего нет И если редактирование запрещено
       if (this.taken === false) {
+          this.displayInfo(i, j);
           this.updateCell1(td);  // Забираем из ячейки
-          this.displayInfo(i, j, this.scene.getCell(i, j));
       } 
       // Если в руках есть юнит
       else if (this.taken === true) {
           this.updateCell2(td);  // Кладем в новую ячейку
-          this.displayInfo(i, j, this.scene.getCell(i, j));
+          this.displayInfo(i, j);
       }
     }
   }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////|
+
+
   // Изменение ячейки
   updateCell(tdElement, i, j) {
-    let selected = parseInt(document.getElementById('terrain-select').value);  // Берем выбранный ID ландшафта из выпадающего списка
+    const terrainSelectValue = parseInt(document.getElementById('terrain-select').value, 10);
+    const unitSelectValue = parseInt(document.getElementById('unit-select').value, 10);
 
-    // Если это юнит тогда добавляем img в td
-    if (selected == 5) {
-      let img = document.createElement('img');
-      img.src = `./img/icon.png`;
+    // Если выбран terrain, ставим его в первую очередь (чтобы terrain можно было всегда менять)
+    if (!isNaN(terrainSelectValue) && terrainSelectValue) {
+      this.scene.setCell(i, j, terrainSelectValue, 'terrain');
+
+      tdElement.className = 'terrain-' + terrainSelectValue;
+      return;
+    }
+
+    // Если выбран юнит, ставим его на клетку
+    if (!isNaN(unitSelectValue) && unitSelectValue) {
+      const unit = window.unitMap && window.unitMap[unitSelectValue];
+      if (!unit) {
+        console.warn('Юнит не найден в справочнике:', unitSelectValue);
+        return;
+      }
+
+      // сохраняем в модель
+      this.scene.setCell(i, j, { ...unit }, 'unit');
+
+      // Обновляем DOM (рисуем иконку юнита)
+      tdElement.innerHTML = '';
+      tdElement.className = 'terrain-' + (this.scene.getCell(i, j).terrain || 1);
+      const img = document.createElement('img');
+      img.src = unit.icon || unit.img || './img/icon.png';
       img.classList.add('img-size');
       tdElement.appendChild(img);
-      this.units.push(`${i}_${j}`);
+
       return;
-    } else {
-      this.scene.setCell(i, j, selected);  // Меняем данные ячейки в массиве
-      tdElement.className = 'terrain-' + selected;  // Меняем класс ячейки
-    }  
+    }
+    // Если ничего не выбрано, ничего не делаем
+    return;
   }
+
   updateCell1(tdElement) {
     const img = tdElement.querySelector('img');
     if (img) {
-      this.taken_img = img;  // Сохраняем img в переменную
-      img.remove();          // Удаляем img из HTML
-      this.taken = true;     // Теперь юнит "в руках"
+      // берем юнита из модели, запоминаем и удаляем из клетки
+      const [i, j] = tdElement.dataset.coord.split('_').map(Number);
+      this.taken_unit = this.scene.getCell(i, j).unit;
+      this.scene.setCell(i, j, null, 'unit');
+
+      img.classList.add('border');  // Присваиваем выделение
+      this.taken = true;            // Теперь юнит "в руках"
+      this.taken_img = img;         // Сохраняем img в переменную для переноса в DOM
     }
   }
+
   updateCell2(tdElement) {
-    if (this.taken_img) {
-      tdElement.appendChild(this.taken_img);  // Вставляем сохраненную картинку
-      this.taken_img = null;                  // Опустошаем переменную
-      this.taken = false;                     // Сбрасываем флаг (рука пуста)
+    if (this.taken_unit && this.taken_img) {
+      const [i, j] = tdElement.dataset.coord.split('_').map(Number);
+      const targetCell = this.scene.getCell(i, j);
+
+      // нельзя выпустить юнита в занятую клетку
+      if (targetCell && targetCell.unit) {
+        alert('Клетка занята другим юнитом, выберите свободную клетку.');
+        return;  // оставляем юнита в руках
+      }
+
+      // ставим юнита в новую клетку в модели
+      this.scene.setCell(i, j, this.taken_unit, 'unit');
+
+      // обновляем DOM: перенос картинки
+      tdElement.appendChild(this.taken_img);
+      this.taken_img.classList.remove('border');  // Убираем выделение
+
+      this.taken_img = null;                      // Опустошаем переменную
+      this.taken_unit = null;
+      this.taken = false;                         // Сбрасываем флаг (рука пуста)
     }
   }
 }

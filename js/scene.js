@@ -11,12 +11,17 @@ class Scene {
     this.generate();           // Сразу создаем пустую сетку
   }
 
-  // Заполняет матрицу значением "1" (трава)
-  generate() {
+  // Заполняет матрицу значением "1" (трава). Опционально можно передать новый размер.
+  generate(width, height) {
+    // Если передан новый размер, применяем его.
+    if (width) this.rows = width;
+    if (height) this.cols = height;
+
+    this.matrix = [];
     for (let i = 0; i < this.rows; i++) {
-      this.matrix[i] = [];                   // Создаем строку
+      this.matrix[i] = [];                               // Создаем строку
       for (let j = 0; j < this.cols; j++) {
-        this.matrix[i][j] = 1;               // Создаем столбец
+        this.matrix[i][j] = { terrain: 1, unit: null };  // Создаем столбец
       }
     }
   }
@@ -27,7 +32,9 @@ class Scene {
   }
 
   // Меняет тип территории и сохраняет всю карту в текстовое поле для экспорта
-  setCell(i, j, value) {
-    this.matrix[i][j] = value;
+  setCell(i, j, value, field = 'terrain') {
+    const cell = this.matrix[i]?.[j];
+    if (!cell) return;
+    cell[field] = value;
   }
 }

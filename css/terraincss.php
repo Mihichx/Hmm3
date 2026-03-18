@@ -13,7 +13,7 @@ $opt = [
 try {
     $db = new PDO($dsn, $dbAuth['user'], $dbAuth['password'], $opt);
 
-    $query = "SELECT id, img_link FROM terrain_homm";
+    $query = "SELECT id, img_link FROM terrain";
     $stmt = $db->query($query);
 
     while ($row = $stmt->fetch()) {
