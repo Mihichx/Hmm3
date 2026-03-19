@@ -37,4 +37,28 @@ class Scene {
     if (!cell) return;
     cell[field] = value;
   }
+  checkMove(from, to) {
+    const unit = this.matrix[from.i][from.j].unit;
+    if (!unit) return false;
+
+    const rowDiff = Math.abs(from.i - to.i);
+    const colDiff = Math.abs(from.j - to.j);
+
+    // ПУНКТ 9: Только линейное движение (одна из разниц должна быть 0)
+    if (rowDiff !== 0 && colDiff !== 0) {
+        alert("Движение только по прямой!");
+        return false;
+    }
+
+    const distance = rowDiff + colDiff;
+
+    // ПУНКТ 10: Проверка и уменьшение выносливости
+    if (unit.stamina.current >= distance) {
+        unit.stamina.current -= distance;
+        return true;
+    } else {
+        alert(`Недостаточно выносливости! Нужно ${distance}, осталось ${unit.stamina.current}`);
+        return false;
+    }
+}
 }
