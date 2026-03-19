@@ -42,13 +42,18 @@ typeList
                 unitSelector.appendChild(option);
 
                 const fullUnit = typeList.list.units.getOne(item.type);
+                const unitSpeed = fullUnit?.speed ?? 5;
                 const normalizedUnit = {
                     id: fullUnit?.id ?? Number(item.type),
                     name: fullUnit?.name ?? item.name,
                     type: fullUnit?.name ?? item.name,
                     icon: `./img/${fullUnit?.icon}`,
                     health: fullUnit?.Health ?? null,
-                    speed: fullUnit?.speed ?? null,
+                    speed: unitSpeed,
+                    stamina: {
+                        current: unitSpeed,
+                        max: unitSpeed
+                    },
                     attack: fullUnit?.Attack ?? null,
                     protection: fullUnit?.Protection ?? null,
                     min_damage: fullUnit?.min_damage ?? null,
