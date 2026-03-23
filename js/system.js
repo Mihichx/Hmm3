@@ -79,22 +79,25 @@ let system = (function() {
         
         loadFile(input, handler) {
             let file = input.files[0];
-            
             input.value = '';
             self.readFile(file).then(handler);
         }
         
         fileInfo(file) {
-            return "Loaded file: " + file.name + ", Size: " + file.size + " bytes"
+            return "Loaded file: " + file.name + ", Size: " + file.size + " bytes";
         }
         
-        // загрузка файла
-        async readFile(file) {
-            self.loading = true;
-            self.reader.readAsText(file);
-            
-            while (self.loading) await system.pause(10);
-            return self.reader;
+        // загрузка файла - промисификация вместо активного ожидания
+        readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = () => resolve(reader);
+                reader.onerror = () => reject(new Error('File read failed'));
+                reader.onabort = () => reject(new Error('File read aborted'));
+                
+                reader.readAsText(file);
+            });
         }
     }
     // Erid Nord

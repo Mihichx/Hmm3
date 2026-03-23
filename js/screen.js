@@ -128,11 +128,11 @@ class Screen {
       unit_real_mas.push({
           id: this.scene.getCell(i, j).unit.id,
           unit: this.scene.getCell(i, j).unit,
-          coord: `${i}-${j}`,
+          coord: { i, j },  // Используем объект вместо строки
           stamina: {
             current: unit.stamina.max,
             max: unit.stamina.max
-          },
+          }
       });
       console.table(unit_real_mas);
 
@@ -147,7 +147,6 @@ class Screen {
       return;
     }
     // Если ничего не выбрано, ничего не делаем
-    return;
   }
 
   updateCell1(tdElement) {
@@ -157,9 +156,10 @@ class Screen {
       
       this.taken_unit = this.scene.getCell(i, j).unit;
       this.startCoords = { i, j }; // ПУНКТ 9: Запоминаем откуда идем
-      for (const h of unit_real_mas) {
-        if (h.coord == `${i}-${j}`) {
-          this.u = h;
+      for (const current_unit of unit_real_mas) {
+        if (current_unit.coord.i === i && current_unit.coord.j === j) {
+          this.unit = current_unit;
+          break; // Оптимизация: выходим после первого совпадения
         }
       }
       
@@ -167,7 +167,7 @@ class Screen {
       this.taken = true;
       this.taken_img = img;
     }
-}
+  }
 
   updateCell2(tdElement) {
     if (this.taken_unit && this.taken_img) {
@@ -195,8 +195,10 @@ class Screen {
         this.taken_img = null;
         this.startCoords = null;
 
-        this.u.coord = `${i}-${j}`;
-        console.log(this.u);
+        // Обновляем координаты юнита
+        if (this.unit) {
+          this.unit.coord = { i, j };
+        }
         console.table(unit_real_mas);
       }
     }
