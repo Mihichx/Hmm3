@@ -21,6 +21,7 @@ document.getElementById('gen-scene').onclick = function() {
     document.getElementById('terrain-select').classList.remove("none");    // Показываем выбор территории
     document.getElementById('unit-select').classList.remove("none");       // Показываем выбор юнитов
     document.getElementById('end').classList.remove("none");               // Показываем кнопку "Завершить"
+    document.getElementById('end_step').classList.add("none"); 
     flags = true;  // Разрешаем редактирование
 };
 
@@ -31,5 +32,12 @@ document.getElementById('end').onclick = function() {
     document.getElementById('terrain-select').classList.add("none");  // Прячем выбор территории
     document.getElementById('unit-select').classList.add("none");     // Прячем выбор юнитов
     document.getElementById('end').classList.add("none");             // Прячем кнопку "Завершить"
+    document.getElementById('end_step').classList.remove("none");  
     flags = false;  // Запрещаем редактирование 
+};
+
+// Кнопка "Завершить ход"
+document.getElementById('end_step').onclick = function() {
+    end_step = true;
+    alert("Ход завершён");
 };

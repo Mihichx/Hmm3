@@ -45,6 +45,7 @@
                 <p>Описание: <span id="info-desc"></span></p>
             </div>
         </div>
+        <button id="end_step" class="none">Закончить ход</button>
         <div id="map-container"></div>
     </main>
 </body>

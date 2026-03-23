@@ -1,12 +1,22 @@
 const urlParams = new URLSearchParams(window.location.search);
 
+// Валидация размера карты (мин 5, макс 100)
+function validateMapSize(size, defaultSize = 10) {
+    const parsed = parseInt(size);
+    if (isNaN(parsed) || parsed < 5) return defaultSize;
+    if (parsed > 100) return 100;
+    return parsed;
+}
+
 // Добавляем значение по умолчанию (например, 10), если в URL пусто
 let mapData = {
-    width: parseInt(urlParams.get('map_width')) || 10,
-    height: parseInt(urlParams.get('map_height')) || 10,
+    width: validateMapSize(urlParams.get('map_width')),
+    height: validateMapSize(urlParams.get('map_height')),
 };
 
 let flags = true;                                 // Разрешено ли редактирование прямо сейчас
+let end_step = false;
+let unit_real_mas = [];
 let scene = new Scene(mapData);                   // Создаем логику
 let screen = new Screen(scene, 'map-container');  // Создаем экран
 
