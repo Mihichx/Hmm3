@@ -19,9 +19,9 @@ class Scene {
 
     this.matrix = [];
     for (let i = 0; i < this.rows; i++) {
-      this.matrix[i] = [];                               // Создаем строку
+      this.matrix[i] = [];                                // Создаем строку
       for (let j = 0; j < this.cols; j++) {
-        this.matrix[i][j] = { terrain: 1, unit: null };  // Создаем столбец
+        this.matrix[i][j] = { terrain: 10, unit: null };  // Создаем столбец
       }
     }
   }
